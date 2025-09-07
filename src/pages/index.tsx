@@ -3,7 +3,9 @@ import AuthLayout from "./_auth";
 import Login from "./_public/login/Login";
 import PublicLayout from "./_public";
 import MainPage from "./_auth/main/Main";
-import Leaderboard from "./_public/stream-overlay/Leaderboard";
+import CharacterPage from "./_auth/characters/Character";
+import NewCharacter from "./_auth/characters/NewCharacter";
+import EditCharacter from "./_auth/characters/EditCharacter";
 
 const MainRoute = () => {
   return (
@@ -14,6 +16,11 @@ const MainRoute = () => {
 
       <Route element={<AuthLayout />} path="/main">
         <Route index element={<MainPage />} />
+      </Route>
+      <Route element={<AuthLayout />} path="/characters">
+        <Route index element={<CharacterPage />} />
+        <Route path="new" element={<NewCharacter />} />
+        <Route path="edit" element={<EditCharacter />} />
       </Route>
     </Routes>
   );
