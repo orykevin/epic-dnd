@@ -13,9 +13,11 @@ import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import ClassDialog from "./dialogForm/ClassDialog";
+import RaceDialog from "./dialogForm/RaceDialog";
 
 const schema = z.object({
   name: z.string(),
+  race: z.string(),
   class: z.string(),
   background: z.string(),
   tags: z.array(z.string()),
@@ -54,6 +56,7 @@ ProjectFormsProps) => {
   const forms = useForm({
     defaultValues: {
       name: "",
+      race: "",
       class: "",
       background: "",
       tags: [],
@@ -106,6 +109,7 @@ ProjectFormsProps) => {
             : []
         }
       /> */}
+      <RaceDialog />
       <ClassDialog />
       <div className="grid grid-cols-2 gap-3">
         {Object.keys(abilityScores).map((abilityScore) => (

@@ -5,39 +5,39 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { classInfo } from "@/lib/dndData";
+import { raceInfo } from "@/lib/dndData";
 import { cn } from "@/lib/utils";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 
-const ClassDialog = () => {
+const RaceDialog = () => {
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = React.useState<string>("");
   const forms = useFormContext();
-  const value = forms.watch("class");
+  const value = forms.watch("race");
 
-  const selectClassHandler = (className: string) => {
-    forms.setValue("class", className);
+  const selectRaceHandler = (className: string) => {
+    forms.setValue("race", className);
     setOpen(false);
   };
 
-  const selectedClassData = classInfo.find((item) => item.name === selected);
+  const selectedRaceData = raceInfo.find((item) => item.name === selected);
 
   return (
     <>
-      <label>Class</label>
+      <label>Race (ras)</label>
       <Button
         variant="outline"
         className="w-full capitalize"
         onClick={() => setOpen(true)}
       >
-        {value || "Choose Class"}
+        {value || "Choose Race"}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="overflow-hidden">
-          <h4 className="font-semibold">Choose your Class</h4>
+          <h4 className="font-semibold">Choose your Race</h4>
           <div className="flex gap-1 max-w-max overflow-x-auto pr-1 scrollbar-slim">
-            {classInfo.map((item) => {
+            {raceInfo.map((item) => {
               const isSelected = item.name === selected;
               return (
                 <div
@@ -51,8 +51,8 @@ const ClassDialog = () => {
                   <Tooltip>
                     <TooltipTrigger>
                       <img
-                        className="min-w-10 min-h-10 cursor-pointer rounded-md"
-                        src={`/class-icon/${item.name.toLocaleLowerCase()}.webp`}
+                        className="min-w-10 min-h-10 cursor-pointer rounded-md invert"
+                        src={`/race-icon/${item.name.toLocaleLowerCase()}.png`}
                       />
                     </TooltipTrigger>
                     <TooltipContent className="capitalize text-primary-foreground">
@@ -68,20 +68,12 @@ const ClassDialog = () => {
               {selected}
             </h4>
             <div className="relative">
-              <p className="text-sm w-[50%]">
-                {selectedClassData?.description}
-              </p>
-              {selected && (
-                <img
-                  className="absolute -top-12 -right-12 w-3/4 -z-10 invert-75 opacity-35"
-                  src={`/class-shilloute/${selected.toLocaleLowerCase()}.png`}
-                />
-              )}
+              <p className="text-sm w-full">{selectedRaceData?.description}</p>
             </div>
 
             <h6 className="text-sm font-semibold mt-3 mb-1">Kelebihan</h6>
             <ul className="list-disc font-sm pl-4">
-              {selectedClassData?.strengths.map((item) => (
+              {selectedRaceData?.strengths.map((item) => (
                 <li className="text-sm" key={item}>
                   {item}
                 </li>
@@ -89,7 +81,7 @@ const ClassDialog = () => {
             </ul>
             <h6 className="text-sm font-semibold mt-3 mb-1">Kekurangan</h6>
             <ul className="list-disc font-sm pl-4">
-              {selectedClassData?.weaknesses.map((item) => (
+              {selectedRaceData?.weaknesses.map((item) => (
                 <li className="text-sm" key={item}>
                   {item}
                 </li>
@@ -98,9 +90,9 @@ const ClassDialog = () => {
           </div>
           <Button
             className="w-full"
-            onClick={() => selectClassHandler(selected)}
+            onClick={() => selectRaceHandler(selected)}
           >
-            Select this class
+            Select this race
           </Button>
         </DialogContent>
       </Dialog>
@@ -108,4 +100,4 @@ const ClassDialog = () => {
   );
 };
 
-export default ClassDialog;
+export default RaceDialog;
