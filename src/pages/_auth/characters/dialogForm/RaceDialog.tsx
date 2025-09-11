@@ -25,26 +25,29 @@ const RaceDialog = () => {
 
   return (
     <>
-      <label>Race (ras)</label>
-      <Button
-        variant="outline"
-        className="w-full capitalize"
-        onClick={() => setOpen(true)}
-      >
-        {value || "Choose Race"}
-      </Button>
+      <div className="w-full">
+        <label className="font-semibold">Race (ras)</label>
+        <Button
+          variant="outline"
+          className="w-full capitalize"
+          onClick={() => setOpen(true)}
+        >
+          {value || "Choose Race"}
+        </Button>
+      </div>
+
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="overflow-hidden">
           <h4 className="font-semibold">Choose your Race</h4>
-          <div className="flex gap-1 max-w-max overflow-x-auto pr-1 scrollbar-slim">
+          <div className="flex gap-1 max-w-max overflow-x-auto pr-1 scrollbar-slim px-1 py-1">
             {raceInfo.map((item) => {
               const isSelected = item.name === selected;
               return (
                 <div
                   key={item.name}
                   className={cn(
-                    "opacity-50 cursor-pointer",
-                    isSelected && "opacity-100"
+                    "opacity-50 cursor-pointer w-12 h-12 p-1 rounded-md",
+                    isSelected && "opacity-100 ring ring-primary"
                   )}
                   onClick={() => setSelected(item.name)}
                 >
@@ -63,33 +66,38 @@ const RaceDialog = () => {
               );
             })}
           </div>
-          <div>
-            <h4 className="font-semibold text-xl mb-3 capitalize">
-              {selected}
-            </h4>
-            <div className="relative">
-              <p className="text-sm w-full">{selectedRaceData?.description}</p>
-            </div>
+          {selectedRaceData && (
+            <div>
+              <h4 className="font-semibold text-xl mb-3 capitalize">
+                {selected}
+              </h4>
+              <div className="relative">
+                <p className="text-sm w-full">
+                  {selectedRaceData?.description}
+                </p>
+              </div>
 
-            <h6 className="text-sm font-semibold mt-3 mb-1">Kelebihan</h6>
-            <ul className="list-disc font-sm pl-4">
-              {selectedRaceData?.strengths.map((item) => (
-                <li className="text-sm" key={item}>
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <h6 className="text-sm font-semibold mt-3 mb-1">Kekurangan</h6>
-            <ul className="list-disc font-sm pl-4">
-              {selectedRaceData?.weaknesses.map((item) => (
-                <li className="text-sm" key={item}>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+              <h6 className="text-sm font-semibold mt-3 mb-1">Kelebihan</h6>
+              <ul className="list-disc font-sm pl-4">
+                {selectedRaceData?.strengths.map((item) => (
+                  <li className="text-sm" key={item}>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <h6 className="text-sm font-semibold mt-3 mb-1">Kekurangan</h6>
+              <ul className="list-disc font-sm pl-4">
+                {selectedRaceData?.weaknesses.map((item) => (
+                  <li className="text-sm" key={item}>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <Button
             className="w-full"
+            disabled={!selected}
             onClick={() => selectRaceHandler(selected)}
           >
             Select this race
