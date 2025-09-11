@@ -14,12 +14,16 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import ClassDialog from "./dialogForm/ClassDialog";
 import RaceDialog from "./dialogForm/RaceDialog";
+import RadioFormInput from "@/components/forms/FormRadioInput";
+import AvatarDialog from "./dialogForm/AvatarDialog";
 
 const schema = z.object({
   name: z.string(),
+  gender: z.string(),
   race: z.string(),
   class: z.string(),
   background: z.string(),
+  characteristic: z.string(),
   tags: z.array(z.string()),
   abilityScores: z.object({
     str: z.string(),
@@ -56,9 +60,11 @@ ProjectFormsProps) => {
   const forms = useForm({
     defaultValues: {
       name: "",
+      gender: "",
       race: "",
       class: "",
       background: "",
+      characteristic: "",
       tags: [],
       abilityScores: {
         str: "",
@@ -99,18 +105,40 @@ ProjectFormsProps) => {
 
   return (
     <FormWrapper className="space-y-2" forms={forms} onSubmitHandler={onSubmit}>
+      <div>
+        <div className="flex gap-3">
+          <div className="w-24 h-24 border border-border rounded-md px-2 pt-1">
+            <img
+              src="/shiloute.png"
+              className="w-full h-full object-cover opacity-50 invert"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <div>
+              <Button>Upload</Button>
+            </div>
+            <div className="flex gap-2">
+              <Button>Generate</Button>
+              <AvatarDialog />
+            </div>
+          </div>
+        </div>
+      </div>
       <TextFormInput name="name" label="Name" />
-      {/* <FormMultiSelect
-        name="tags"
-        label="Tags"
-        options={
-          classLists
-            ? classLists.map((item) => ({ label: item, value: item }))
-            : []
-        }
-      /> */}
-      <RaceDialog />
-      <ClassDialog />
+      <RadioFormInput
+        items={[
+          { label: "Male", value: "male" },
+          { label: "Female", value: "female" },
+        ]}
+        name="gender"
+        label="Gender"
+      />
+      <div className="flex gap-3">
+        <RaceDialog />
+        <ClassDialog />
+      </div>
+      <TextareaFormInput name="background" label="Background / Origin" />
+      <TextareaFormInput name="characteristic" label="Characteristic" />
       <div className="grid grid-cols-2 gap-3">
         {Object.keys(abilityScores).map((abilityScore) => (
           <SelectInputForm
@@ -126,10 +154,9 @@ ProjectFormsProps) => {
           />
         ))}
       </div>
-      <TextFormInput name="background" label="Background" />
-      <FormImageUpload name="images" label="Images" />
+
       <Button disabled={isSubmitting} className="w-full my-3">
-        {type === "create" ? "Create Project" : "Update Project"}
+        {type === "create" ? "Create Character" : "Update Character"}
       </Button>
     </FormWrapper>
   );
