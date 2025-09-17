@@ -12,7 +12,7 @@ import { useFormContext } from "react-hook-form";
 
 const ClassDialog = () => {
   const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState<string>("");
+  const [selected, setSelected] = React.useState<string>("barbarian");
   const forms = useFormContext();
   const value = forms.watch("class");
 

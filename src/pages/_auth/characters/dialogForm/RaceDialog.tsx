@@ -12,7 +12,7 @@ import { useFormContext } from "react-hook-form";
 
 const RaceDialog = () => {
   const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState<string>("");
+  const [selected, setSelected] = React.useState<string>("human");
   const forms = useFormContext();
   const value = forms.watch("race");
 

@@ -9,13 +9,16 @@ import { abilityLists } from "@/lib/dndData";
 import { api } from "@convex/_generated/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "convex-helpers/react/cache/hooks";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import ClassDialog from "./dialogForm/ClassDialog";
 import RaceDialog from "./dialogForm/RaceDialog";
 import RadioFormInput from "@/components/forms/FormRadioInput";
 import AvatarDialog from "./dialogForm/AvatarDialog";
+import ImageCropper from "@/components/image-cropper";
+import { createFileFromBlobURL, normalizeAbilityScores } from "@/lib/utils";
+import { useConvexMutation, useConvexUploadFile } from "@/lib/convex-functions";
 
 const schema = z.object({
   name: z.string(),
@@ -24,7 +27,6 @@ const schema = z.object({
   class: z.string(),
   background: z.string(),
   characteristic: z.string(),
-  tags: z.array(z.string()),
   abilityScores: z.object({
     str: z.string(),
     dex: z.string(),
@@ -65,7 +67,6 @@ ProjectFormsProps) => {
       class: "",
       background: "",
       characteristic: "",
-      tags: [],
       abilityScores: {
         str: "",
         dex: "",
@@ -78,7 +79,18 @@ ProjectFormsProps) => {
     resolver: zodResolver(schema as any),
   });
 
-  // const tags = useQuery(api.v1.tags.getTags);
+  const { upload, uploading } = useConvexUploadFile(api.v1.upload);
+  const { mutate, isPending } = useConvexMutation(
+    api.v1.character.createCharacters
+  );
+
+  const [images, setImages] = useState<{
+    fullImageUrl: string;
+    avatarUrl: string;
+  }>({
+    fullImageUrl: "",
+    avatarUrl: "",
+  });
 
   const abilityScores = forms.watch("abilityScores") as z.infer<
     typeof schema
@@ -98,31 +110,50 @@ ProjectFormsProps) => {
     [selectedAbilityScores]
   );
 
-  const onSubmit = (data: z.infer<typeof schema>) => {
-    console.log(data);
+  const onSubmit = async (data: z.infer<typeof schema>) => {
+    // console.log(data);
+    const finalData = {
+      ...data,
+      abilityScores: normalizeAbilityScores(data.abilityScores),
+    };
+    const randomUUID = crypto.randomUUID();
+    const fullImageFile = await createFileFromBlobURL(
+      images.fullImageUrl,
+      "fullImage"
+    );
+    const avatarImageFile = await createFileFromBlobURL(
+      images.avatarUrl,
+      "avatarImage"
+    );
+    const fullImageKey = await upload(fullImageFile, {
+      key: "characters/fullImage/" + randomUUID,
+    });
+    const avatarImageKey = await upload(avatarImageFile, {
+      key: "characters/avatarImage/" + randomUUID,
+    });
+    if (!fullImageKey)
+      console.error("fullImageKey", "failed to upload full image");
+    if (!avatarImageKey)
+      console.error("avatarImageKey", "failed to upload avatar image");
+    mutate({
+      ...finalData,
+      imageFullUrl: fullImageKey,
+      imageAvatarUrl: avatarImageKey,
+    });
     onFormSubmit(data);
+  };
+
+  const onImageUploadedHandler = (fullImageUrl: string, avatarUrl: string) => {
+    setImages({
+      fullImageUrl,
+      avatarUrl,
+    });
   };
 
   return (
     <FormWrapper className="space-y-2" forms={forms} onSubmitHandler={onSubmit}>
-      <div>
-        <div className="flex gap-3">
-          <div className="w-24 h-24 border border-border rounded-md px-2 pt-1">
-            <img
-              src="/shiloute.png"
-              className="w-full h-full object-cover opacity-50 invert"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <div>
-              <Button>Upload</Button>
-            </div>
-            <div className="flex gap-2">
-              <Button>Generate</Button>
-              <AvatarDialog />
-            </div>
-          </div>
-        </div>
+      <div className="mt-4 mb-0">
+        <ImageCropper onImageCropUpload={onImageUploadedHandler} />
       </div>
       <TextFormInput name="name" label="Name" />
       <RadioFormInput
@@ -155,7 +186,11 @@ ProjectFormsProps) => {
         ))}
       </div>
 
-      <Button disabled={isSubmitting} className="w-full my-3">
+      <Button
+        disabled={isSubmitting || isPending || uploading}
+        className="w-full my-3"
+        type="submit"
+      >
         {type === "create" ? "Create Character" : "Update Character"}
       </Button>
     </FormWrapper>
